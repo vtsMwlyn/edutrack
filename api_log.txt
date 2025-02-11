@@ -1,0 +1,272 @@
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"1fc5e6bc-0061-47c5-85b1-3994928a2b5c","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":false,"message":"OTP expired","code":"4030202"}
+
+Verify OTP Response: {"status":false,"message":"OTP expired","code":"4030202"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"5a3df8f9-397b-4236-9bcd-4b72b8ad579b","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"310e0932-aea8-4f92-b6c6-dc11a2758bd9","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"33b1f6fb-104b-4c17-abf3-334caf306bac","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"fba7986c-0a55-4b59-aac4-56516df53a7e","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"1afd7b1c-b130-4800-98e8-595dbad71506","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"313ec106-aa48-4dd7-94d3-74f3e72ee0ca","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":false,"message":"OTP invalid","code":"4030201"}
+
+Verify OTP Response: {"status":false,"message":"OTP invalid","code":"4030201"}
+
+Verify OTP Response: {"status":false,"message":"OTP invalid","code":"4030201"}
+
+Verify OTP Response: {"status":false,"message":"OTP invalid","code":"4030201"}
+
+Verify OTP Response: {"status":false,"message":"OTP invalid","code":"4030201"}
+
+Verify OTP Response: {"status":false,"message":"OTP invalid","code":"4030201"}
+
+Verify OTP Response: {"status":false,"message":"OTP invalid","code":"4030201"}
+
+Verify OTP Response: {"status":false,"message":"OTP invalid","code":"4030201"}
+
+Verify OTP Response: {"status":false,"message":"OTP invalid","code":"4030201"}
+
+Verify OTP Response: {"status":false,"message":"OTP invalid","code":"4030201"}
+
+Verify OTP Response: {"status":false,"message":"OTP invalid","code":"4030201"}
+
+Verify OTP Response: {"status":false,"message":"OTP invalid","code":"4030201"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"7dcb72ec-adf5-4845-875b-5f2f6d214407","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"62ca2467-9351-4707-89b8-4181c28afd5d","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"ad4c4b16-9f0c-4c74-b83b-90eda68bbcf4","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"3d16bb31-0e33-48fd-bbb9-a9557d669269","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"92d2767e-86e5-47e3-867a-76a90d602b6d","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"9b691491-020b-49f8-adff-126acc2b727c","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"c4864333-b542-43f0-b094-49d86baa372f","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"c5481768-0738-43ac-bde2-ef02417d5b69","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"0de088bc-171b-4ed3-9844-05db29a89077","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Send OTP Response: 
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"db67b8ea-4ec9-43e8-b428-dd37b5ee15a3","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"f675cb54-6ed6-449a-bb46-787931aa2e56","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"83fa6c5e-48f6-402f-9e14-dece67e90a63","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"4e95f60d-76f8-499e-ab53-e7a3eb350d01","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"5f730590-0363-4878-a6f1-b4528699014d","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Verify OTP Response: {"status":false,"message":"OTP invalid","code":"4030201"}
+
+Verify OTP Response: {"status":false,"message":"OTP invalid","code":"4030201"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"f65ce4e3-56bf-4b69-b36b-28acc882ea92","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"581581a5-3a22-439d-a474-3a9b08233e7a","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Verify OTP Response: {"status":false,"message":"OTP invalid","code":"4030201"}
+
+Verify OTP Response: {"status":false,"message":"OTP invalid","code":"4030201"}
+
+Verify OTP Response: {"status":false,"message":"OTP invalid","code":"4030201"}
+
+Verify OTP Response: {"status":false,"message":"OTP invalid","code":"4030201"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"06765321-d992-4a56-9e6b-b976a7215e5e","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Send OTP Response: {"status":false,"message":"the balance is not sufficient","code":"4020201"}
+
+Send OTP Response: {"status":false,"message":"the balance is not sufficient","code":"4020201"}
+
+Send OTP Response: {"status":false,"message":"the balance is not sufficient","code":"4020201"}
+
+Send OTP Response: {"status":false,"message":"the balance is not sufficient","code":"4020201"}
+
+Send OTP Response: {"status":false,"message":"the balance is not sufficient","code":"4020201"}
+
+Send OTP Response: {"status":false,"message":"the balance is not sufficient","code":"4020201"}
+
+Send OTP Response: {"status":false,"message":"the balance is not sufficient","code":"4020201"}
+
+Send OTP Response: {"status":false,"message":"the balance is not sufficient","code":"4020201"}
+
+Send OTP Response: {"status":false,"message":"the balance is not sufficient","code":"4020201"}
+
+Send OTP Response: {"status":false,"message":"the balance is not sufficient","code":"4020201"}
+
+Send OTP Response: {"status":false,"message":"the balance is not sufficient","code":"4020201"}
+
+Send OTP Response: {"status":false,"message":"the balance is not sufficient","code":"4020201"}
+
+Send OTP Response: {"status":false,"message":"the balance is not sufficient","code":"4020201"}
+
+Send OTP Response: {"status":false,"message":"the balance is not sufficient","code":"4020201"}
+
+Send OTP Response: {"status":false,"message":"the balance is not sufficient","code":"4020201"}
+
+Send OTP Response: {"status":false,"message":"the balance is not sufficient","code":"4020201"}
+
+Send OTP Response: {"status":false,"message":"the balance is not sufficient","code":"4020201"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"2aebb6bc-35d2-4718-afff-4874d498fec9","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Send OTP Response: {"status":false,"message":"Error","code":"5000200"}
+Send OTP Response: {"status":false,"message":"Error","code":"5000200"}
+Send OTP Response: {"status":false,"message":"Error","code":"5000200"}
+Send OTP Response: {"status":false,"message":"Error","code":"5000200"}
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"0c9121c9-896c-4114-a56c-bac1ac712e0b","otp":"XXXXXX","otp_length":6,"prefix":"0811","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"4cc5b03e-7cc5-4340-a291-377becfab31e","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"377263ee-1e37-4fe8-bb88-31c4f223f8f8","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"18dab841-5dcf-4420-ba1b-8c88169998cf","otp":"XXXXXX","otp_length":6,"prefix":"0811","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"29589358-6ea9-47a2-ab0a-818fadec02e0","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"08547741-8b03-4d46-a343-688613cbdebf","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"4fe6573c-0ff5-49d6-a972-9958ce7551a8","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"420d9709-a31f-4ec4-98a2-2c1a75005f37","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":false,"message":"OTP invalid","code":"4030201"}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Verify OTP Response: {"status":false,"message":"OTP invalid","code":"4030201"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"295280fc-00c7-42de-83b3-3a47ca3b5dde","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"2c29c0c0-144f-4133-be8b-59bdebed58c7","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"d050cd23-21f0-4675-ba55-d891102154f8","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"c37dad02-7f13-470b-88c7-3d9c72a57835","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"4bfd079d-19df-4ffa-8d11-7579f0733523","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Send OTP Response: {"status":false,"message":"Error","code":"5000200"}
+Send OTP Response: {"status":false,"message":"Error","code":"5000200"}
+Send OTP Response: {"status":false,"message":"Error","code":"5000200"}
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"0c524c31-1473-4b1a-bf9b-9c8fc3d4959b","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"87280fa3-412f-403f-81f0-2831cc2b2292","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"def01dfe-f23b-4f92-91a5-7339497f52df","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"41d28642-eb72-4c7d-902c-ede1cf6824e7","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"3700eab7-6e16-4fc6-903e-8e6d1ba71501","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"9eabd93a-32ff-462d-9b8e-79176f720f0e","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"2c8d5bd8-bf17-47c9-a699-a5c8247c2aa2","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"16add7a8-c381-4eaf-82ab-2e8d00cbdbb5","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"fed0a03d-df5e-444e-8064-08e74d0daadf","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"9a4b6c59-9b1f-4c68-ad76-0ec5ed4920ef","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"88b21144-f22a-4da7-9a6e-ba29f988cfc5","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Send OTP Response: {"status":false,"message":"gateway does not exists","code":"4000201"}
+
+Send OTP Response: {"status":false,"message":"gateway does not exists","code":"4000201"}
+
+Send OTP Response: {"status":false,"message":"gateway does not exists","code":"4000201"}
+
+Send OTP Response: {"status":false,"message":"gateway does not exists","code":"4000201"}
+
+Send OTP Response: {"status":false,"message":"gateway does not exists","code":"4000201"}
+
+Send OTP Response: {"status":false,"message":"gateway does not exists","code":"4000201"}
+
+Send OTP Response: {"status":false,"message":"gateway does not exists","code":"4000201"}
+
+Send OTP Response: {"status":false,"message":"gateway does not exists","code":"4000201"}
+
+Send OTP Response: {"status":false,"message":"gateway does not exists","code":"4000201"}
+
+Send OTP Response: {"status":false,"message":"gateway does not exists","code":"4000201"}
+
+Send OTP Response: {"status":false,"message":"gateway does not exists","code":"4000201"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"d5bd68ed-491b-41ac-a245-ca307758ae76","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"e485da63-f8d6-454f-a5f1-70ce4a56411d","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"ab302deb-631b-476c-abad-5d9200907d23","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
+
+Verify OTP Response: {"status":false,"message":"OTP invalid","code":"4030201"}
+
+Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
+
