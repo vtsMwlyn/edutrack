@@ -1,74 +1,3 @@
-<?php
-// Mulai session jika belum dimulai
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
-
-include 'connect.php';
-
-// Ambil nama pengguna dari session
-$username = $_SESSION['username'];
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $data = json_decode(file_get_contents('php://input'), true);
-    $selectedSubjects = $data['selectedSubjects'];
-    $username = $data['username'];
-
-    // Query untuk mendapatkan ID siswa berdasarkan username
-    $sql = "SELECT id_siswa FROM siswa WHERE id_pengguna = (SELECT id FROM pengguna WHERE username = ?)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        $siswa_id = $row['id_siswa'];
-
-        // Hapus data sebelumnya
-        $sql_delete = "DELETE FROM mata_pelajaran_siswa WHERE id_siswa = ?";
-        $stmt_delete = $conn->prepare($sql_delete);
-        $stmt_delete->bind_param("i", $siswa_id);
-        $stmt_delete->execute();
-
-        // Simpan mata pelajaran ke database
-        $sql_insert = "INSERT INTO mata_pelajaran_siswa (id_siswa, id_mapel) VALUES (?, ?)";
-        $stmt_insert = $conn->prepare($sql_insert);
-
-        foreach ($selectedSubjects as $subject_name) {
-            // Ambil ID mata pelajaran berdasarkan nama
-            $sql_mapel = "SELECT id_mapel FROM mata_pelajaran WHERE nama_mapel = ?";
-            $stmt_mapel = $conn->prepare($sql_mapel);
-            $stmt_mapel->bind_param("s", $subject_name);
-            $stmt_mapel->execute();
-            $mapel_result = $stmt_mapel->get_result();
-
-            if ($mapel_result->num_rows > 0) {
-                $mapel_row = $mapel_result->fetch_assoc();
-                $mapel_id = $mapel_row['id_mapel'];
-
-                // Simpan data id_siswa dan id_mapel
-                $stmt_insert->bind_param("ii", $siswa_id, $mapel_id);
-                $stmt_insert->execute();
-            }
-        }
-
-        // Setelah semua berhasil, kirimkan respons sukses
-        echo json_encode(["success" => true]);
-        exit();  // Hentikan eksekusi lebih lanjut agar tidak ada pengiriman data tambahan
-    } else {
-        echo json_encode(["success" => false, "message" => "User tidak ditemukan."]);
-        exit(); // Hentikan eksekusi jika user tidak ditemukan
-    }
-}
-
-if (!isset($_SESSION['username'])) {
-    echo json_encode(["success" => false, "message" => "Session username tidak ditemukan."]);
-    exit();  // Hentikan eksekusi jika session username tidak ditemukan
-}
-?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -281,33 +210,90 @@ if (!isset($_SESSION['username'])) {
                 selectedSubjectsInput.value = JSON.stringify(selectedSubjectsData);
                 
                 fetch('save_subjects.php', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-        username: "<?php echo $username; ?>",
-        selectedSubjects: selectedSubjectsData,
-    }),
-})
-    .then(response => response.json())
-    .then(data => {
-        console.log('Response dari server:', data); // Debugging log server response
-        if (data.success) {
-            alert('Data berhasil disimpan!');
-            window.location.href = 'siswa_dashboard.php';
-        } else {
-            alert('Terjadi kesalahan: ' + data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Terjadi kesalahan saat menyimpan data.');
-    });
-
-
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: "<?php echo $username; ?>",
+                        selectedSubjects: selectedSubjectsData
+                    })
+                }).then(response => response.json()).then(data => {
+                    if (data.success) {
+                        alert('Data berhasil disimpan!');
+                    } else {
+                        alert('Terjadi kesalahan saat menyimpan data.');
+                    }
+                }).catch(error => {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat menyimpan data.');
+                });
             });
         });
     </script>
 </body>
 </html>
+
+<?php
+// Mulai session jika belum dimulai
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+include 'connect.php';
+
+// Ambil nama pengguna dari session
+$username = $_SESSION['username'];
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $selectedSubjects = $data['selectedSubjects'];
+    $username = $data['username'];
+
+    // Query untuk mendapatkan ID siswa berdasarkan username
+    $sql = "SELECT id_siswa FROM siswa WHERE id_pengguna = (SELECT id FROM pengguna WHERE username = ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $siswa_id = $row['id_siswa'];
+
+        // Hapus data sebelumnya
+        $sql_delete = "DELETE FROM mata_pelajaran_siswa WHERE id_siswa = ?";
+        $stmt_delete = $conn->prepare($sql_delete);
+        $stmt_delete->bind_param("i", $siswa_id);
+        $stmt_delete->execute();
+
+        // Simpan mata pelajaran ke database
+        $sql_insert = "INSERT INTO mata_pelajaran_siswa (id_siswa, id_mapel) VALUES (?, ?)";
+        $stmt_insert = $conn->prepare($sql_insert);
+
+        foreach ($selectedSubjects as $subject_name) {
+            // Ambil ID mata pelajaran berdasarkan nama
+            $sql_mapel = "SELECT id_mapel FROM mata_pelajaran WHERE nama_mapel = ?";
+            $stmt_mapel = $conn->prepare($sql_mapel);
+            $stmt_mapel->bind_param("s", $subject_name);
+            $stmt_mapel->execute();
+            $mapel_result = $stmt_mapel->get_result();
+
+            if ($mapel_result->num_rows > 0) {
+                $mapel_row = $mapel_result->fetch_assoc();
+                $mapel_id = $mapel_row['id_mapel'];
+
+                // Simpan data id_siswa dan id_mapel
+                $stmt_insert->bind_param("ii", $siswa_id, $mapel_id);
+                $stmt_insert->execute();
+            }
+        }
+
+        echo json_encode(["success" => true]);
+    } else {
+        echo json_encode(["success" => false, "message" => "User tidak ditemukan."]);
+    }
+}
+?>
+
+

@@ -9,7 +9,6 @@ if (!isset($_SESSION['username'])) {
 
 // Ambil id_siswa dari session
 $id_siswa = $_SESSION['username'];
-$user_type = $_SESSION['tipe_pengguna'];
 
 // Include koneksi database
 include 'connect.php';
@@ -17,7 +16,7 @@ include 'connect.php';
 
 
 // Mengambil daftar tugas yang belum di-submit untuk form submit
-$stmt_submit = $conn->prepare("SELECT id_tugas, nama_tugas, deskripsi, tanggal_tenggat FROM tugas WHERE (id_siswa = ?) AND status != 'Submitted'");
+$stmt_submit = $conn->prepare("SELECT id_tugas, nama_tugas, deskripsi, tanggal_tenggat FROM tugas WHERE (id_siswa IS NULL OR id_siswa != ?) AND status != 'Submitted'");
 $stmt_submit->bind_param("i", $id_siswa);
 $stmt_submit->execute();
 $result_submit = $stmt_submit->get_result();
@@ -68,7 +67,7 @@ if (isset($_POST['retract_task'])) {
     }
 
     // Mengubah status tugas dan menghapus id_siswa sehingga tugas bisa disubmit lagi
-    $retract_query = "UPDATE tugas SET id_siswa = ?, file_name = NULL, status = 'Returned' WHERE id_tugas = ? AND id_siswa = ?";
+    $retract_query = "UPDATE tugas SET id_siswa = NULL, file_name = NULL, status = 'Returned' WHERE id_tugas = ? AND id_siswa = ?";
     $stmt_retract = $conn->prepare($retract_query);
     $stmt_retract->bind_param("ii", $id_tugas_retract, $id_siswa);
 
@@ -103,6 +102,80 @@ $conn->close();
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="style.css">
     <title>View Task</title>
+    <style>
+        .container {
+            max-height: 90vh; /* Membatasi tinggi kontainer */
+            overflow-y: auto; /* Aktifkan scroll jika konten terlalu panjang */
+            width: 100%;
+        }
+
+        form {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 40px;
+            /* margin-left: -500px; */
+            display: flex; /* Aktifkan flexbox untuk membuatnya fleksibel */
+            flex-direction: column; /* Konten di dalam form tetap vertikal */
+            width: 100%; /* Gunakan persentase agar melebar sesuai ukuran layar */
+            max-height: 80vh; /* Membatasi tinggi form */
+            overflow-y: auto; /* Aktifkan scroll vertikal */
+            font-family: 'Arial', sans-serif;
+        }
+
+
+        form h2 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+            color: #555;
+        }
+
+        form input[type="text"],
+        form input[type="date"],
+        form select,
+        form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #333;
+            background-color: #f9f9f9;
+            box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease-in-out;
+        }
+
+        form button {
+            background-color: #62c1b6;
+            color: #fff;
+            border: none;
+            padding: 12px 16px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            width: 100%;
+            text-align: center;
+        }
+
+        form button:hover {
+            background-color: #504e76;
+            transform: scale(1.02);
+        }
+
+    </style>
     <script>
         // Menyimpan data tugas dalam JavaScript agar dapat digunakan saat dropdown dipilih
         const tugasDataSubmit = <?php echo json_encode($tugas_list_submit); ?>;
@@ -188,58 +261,7 @@ $conn->close();
             ?>
         </select>
         <input type="submit" name="retract_task" value="Retract Task">
-
-
-
     </form>
-       <!-- Profile Sidebar -->
-  <div id="sidebar" class="profile-sidebar">
-    <div class="profile-overview">
-        <img src="https://cdn.discordapp.com/attachments/749553877333835846/1305882693116100608/3778bb3bb63024da3c52aa0f47fdd603.png?ex=6734a588&is=67335408&hm=5b951564b1a1246b3decb6dfdceafbde2e16ef24ae1484c09e81bb268096d39b&" alt="Profile Picture" class="profile-pic">
-        <h2><?php echo htmlspecialchars($id_siswa);  ?>!</h2></h2>
-    </div>
-    <div class="profile-stats">
-    <div><?php echo htmlspecialchars($user_type); ?></div>
-        <div>Unit: Highschool</div>
-    </div>
-    <button class="logout-button" onclick="window.location.href='logout.php'">
-    <i class="fas fa-sign-out-alt"></i> 
-</button>
 
-</button>
-
-           
-    <!-- Toggle Button -->
-<div class="right-container">
-			<button id="toggle-btn" class="sidebar-toggle">
-			<i class="fas fa-user-circle"></i>
-			</button>
-			</div>
-                <nav class="menus">
-                    <ul>
-                   
-</button>
-
-                    </ul>
-                </nav>
-            </aside>
-            
-		   
-</div>
-    <script>
-    // Toggle Sidebar on Button Click
-document.getElementById("toggle-btn").addEventListener("click", function() {
-    var sidebar = document.getElementById("sidebar");
-    sidebar.classList.toggle("open");
-});
-
-// Fungsi untuk mengarahkan ke halaman kelas saat kartu diklik
-function openClass(subject) {
-        alert('Masuk ke kelas: ' + subject);
-        // Anda bisa mengubah alert menjadi redirect ke halaman kelas, misalnya:
-        // window.location.href = '/kelas/' + subject.toLowerCase();
-    }
-
-</script>
 </body>
 </html>

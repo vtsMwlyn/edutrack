@@ -13,7 +13,6 @@ include 'connect.php';
 
 // Ambil nama pengguna dari session
 $username = $_SESSION['username'];
-$user_type = $_SESSION['tipe_pengguna'];
 
 // Ambil jumlah assignment dari database
 $query = "SELECT COUNT(*) AS total_assignments FROM assignments"; // Sesuaikan nama tabel jika berbeda
@@ -95,7 +94,7 @@ $tanggal = date('F jS, Y'); // Format tanggal "October 21st, 2024"
                     <ul>
                         <li><a href="#"><i class="fas fa-home"></i></a></li>
                         <li><a href="calender.php"><i class="fas fa-calendar-alt"></i></a></li>
-                        <li><a href="kelas.php"><i class="fas fa-user"></i></a></li>
+                        <li><a href="mapel.php"><i class="fas fa-user"></i></a></li>
                         
                     </ul>
                 </nav>
@@ -185,7 +184,7 @@ $tanggal = date('F jS, Y'); // Format tanggal "October 21st, 2024"
         <h2><?php echo htmlspecialchars($username);  ?>!</h2></h2>
     </div>
     <div class="profile-stats">
-        <div><?php echo htmlspecialchars($user_type); ?></div>
+        <div>Student</div>
         <div>Unit: Highschool</div>
     </div>
     <button class="logout-button" onclick="window.location.href='logout.php'">

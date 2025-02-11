@@ -15,7 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_file)) {
         // Insert data ke dalam database
-        $stmt = $conn->prepare("INSERT INTO tugas (id_siswa, nama_tugas, deskripsi, status) VALUES (?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO assignments (id_siswa, nama_tugas, deskripsi, status) VALUES (?, ?, ?, ?)");
         $stmt->bind_param("ssss", $student_id, $task_title, $task_description, $target_file);
 
         if ($stmt->execute()) {
