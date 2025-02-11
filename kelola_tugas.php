@@ -7,32 +7,44 @@ include 'connect.php'; // Pastikan koneksi database Anda di sini
 $error_message = "";
 $success_message = "";
 
+
 // Fungsi untuk menambah tugas
 if (isset($_POST['add_task'])) {
     $nama_tugas = $_POST['nama_tugas'];
     $deskripsi = $_POST['deskripsi'];
     $tanggal_tenggat = $_POST['tanggal_tenggat'];
-    $id_siswa = $_POST['id_siswa'];
-    
+    $waktu_tenggat = $_POST['waktu_tenggat']; // ✅ Include waktu_tenggat
+    $id_siswas = $_POST['id_siswa'];
+
     // Pastikan id_mapel ada dalam POST
     $id_mapel = isset($_POST['id_mapel']) ? $_POST['id_mapel'] : null;
 
     // Pastikan id_mapel tidak kosong
     if ($id_mapel !== null) {
-        // Tambahkan tugas
-        $mapel_ids = implode(",", $id_mapel); // Convert array to comma-separated values
-        $sql = "INSERT INTO tugas (nama_tugas, deskripsi, tanggal_tenggat, status, id_mapel, id_siswa) 
-                VALUES ('$nama_tugas', '$deskripsi', '$tanggal_tenggat', 'pending', '$mapel_ids', '$id_siswa')";
-        if (mysqli_query($conn, $sql)) {
+        $all_queries_success = true; // Flag to check if all queries succeed
 
-            $success_message = "Tugas berhasil ditambahkan untuk siswa!";
-        } else {
-            $error_message = "Error: " . mysqli_error($conn);
+        foreach ($id_siswas as $id_siswa) {
+            // Use prepared statements to prevent SQL injection
+            $stmt = $conn->prepare("INSERT INTO tugas (nama_tugas, deskripsi, tanggal_tenggat, waktu, status, id_mapel, id_siswa) 
+                                    VALUES (?, ?, ?, ?, 'pending', ?, ?)");
+            $stmt->bind_param("ssssii", $nama_tugas, $deskripsi, $tanggal_tenggat, $waktu_tenggat, $id_mapel, $id_siswa);
+
+            if (!$stmt->execute()) {
+                $all_queries_success = false;
+                $error_message = "Error: " . $stmt->error;
+                break; // Stop execution if one query fails
+            }
         }
+
+        if ($all_queries_success) {
+            $success_message = "Tugas berhasil ditambahkan untuk semua siswa!";
+        }
+
     } else {
         $error_message = "Mata pelajaran harus dipilih!";
     }
 }
+
 
 // Pastikan user sudah login, jika belum arahkan ke halaman login
 if (!isset($_SESSION['username'])) {
@@ -167,12 +179,12 @@ if (isset($_POST['add_task'])) {
 ?>
 
 <div class="container">
-<?php
-if (isset($_SESSION['message'])) {
-    echo "<div class='notification'>" . $_SESSION['message'] . "</div>";
-    unset($_SESSION['message']); // Hapus pesan setelah ditampilkan
-}
-?>
+    <?php
+        if (isset($_SESSION['message'])) {
+            echo "<div class='notification'>" . $_SESSION['message'] . "</div>";
+            unset($_SESSION['message']); // Hapus pesan setelah ditampilkan
+        }
+    ?>
 
     <form method="POST" class="form-tugas">
         <h2>Tambah Tugas</h2>
@@ -202,211 +214,210 @@ if (isset($_SESSION['message'])) {
             <textarea name="deskripsi" id="deskripsi" required></textarea>
         </div>
 
- <!-- Pilih Siswa -->
-<div class="form-group">
-    <label>Pilih Siswa:</label>
-    <button type="button" id="openModal" class="btn-secondary">Pilih Siswa</button>
-    <div id="siswaModal" class="modal">
-        <div class="modal-content">
-            <span id="closeModal" class="close">&times;</span>
-            <h3 class="modal-title">Daftar Siswa</h3>
+        <!-- Pilih Siswa -->
+        <div class="form-group">
+            <label>Pilih Siswa:</label>
+            <button type="button" id="openModal" class="btn-secondary">Pilih Siswa</button>
+            <div id="siswaModal" class="modal">
+                <div class="modal-content">
+                    <span id="closeModal" class="close">&times;</span>
+                    <h3 class="modal-title">Daftar Siswa</h3>
 
-            <!-- Checkbox Pilih Semua -->
-            <div class="checkbox-container">
-                <div>
-                    <input type="checkbox" id="selectAll"> <strong>Pilih Semua</strong>
+                    <!-- Checkbox Pilih Semua -->
+                    <div class="checkbox-container">
+                        <div>
+                            <input type="checkbox" id="selectAll"> <strong>Pilih Semua</strong>
+                        </div>
+                    </div>
+
+                    <!-- Daftar Siswa -->
+                    <div class="checkbox-container">
+                        <?php
+                            $siswa_query = mysqli_query($conn, "SELECT id_siswa, nama_siswa FROM siswa");
+
+                            while ($siswa = mysqli_fetch_assoc($siswa_query)) {
+                                echo "<div><input type='checkbox' class='siswa-checkbox' name='id_siswa[]' value='" . $siswa['id_siswa'] . "'> " . $siswa['nama_siswa'] . "</div>";
+                            }
+                        ?>
+                    </div>
+
+                    <!-- Tombol Oke -->
+                    <button type="button" id="confirmSelection" class="btn-primary" disabled>Oke</button>
                 </div>
             </div>
-
-            <!-- Daftar Siswa -->
-            <div class="checkbox-container">
-                <?php
-                $siswa_query = mysqli_query($conn, "SELECT id_siswa, nama_siswa FROM siswa");
-                while ($siswa = mysqli_fetch_assoc($siswa_query)) {
-                    echo "<div><input type='checkbox' class='siswa-checkbox' name='id_siswa[]' value='" . $siswa['id_siswa'] . "'> " . $siswa['nama_siswa'] . "</div>";
-                }
-                ?>
-            </div>
-
-            <!-- Tombol Oke -->
-            <button type="button" id="confirmSelection" class="btn-primary" disabled>Oke</button>
         </div>
-    </div>
-</div>
 
-<!-- Menampilkan daftar siswa yang dipilih -->
-<div id="selectedSiswa" class="selected-siswa"></div>
+        <!-- Menampilkan daftar siswa yang dipilih -->
+        <div id="selectedSiswa" class="selected-siswa"></div>
 
-<script>
-    document.getElementById("openModal").addEventListener("click", function() {
-        document.getElementById("siswaModal").style.display = "block";
-    });
+        <script>
+            document.getElementById("openModal").addEventListener("click", function() {
+                document.getElementById("siswaModal").style.display = "block";
+            });
 
-    document.getElementById("closeModal").addEventListener("click", function() {
-        document.getElementById("siswaModal").style.display = "none";
-    });
+            document.getElementById("closeModal").addEventListener("click", function() {
+                document.getElementById("siswaModal").style.display = "none";
+            });
 
-    document.getElementById("confirmSelection").addEventListener("click", function() {
-        document.getElementById("siswaModal").style.display = "none";
-    });
+            document.getElementById("confirmSelection").addEventListener("click", function() {
+                document.getElementById("siswaModal").style.display = "none";
+            });
 
-    // Pilih Semua Checkbox
-    document.getElementById("selectAll").addEventListener("change", function() {
-        let checkboxes = document.querySelectorAll(".siswa-checkbox");
-        checkboxes.forEach(checkbox => checkbox.checked = this.checked);
-    });
+            // Pilih Semua Checkbox
+            document.getElementById("selectAll").addEventListener("change", function() {
+                let checkboxes = document.querySelectorAll(".siswa-checkbox");
+                checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+            });
 
-    // Jika ada yang tidak dicentang, "Pilih Semua" akan nonaktif
-    let siswaCheckboxes = document.querySelectorAll(".siswa-checkbox");
-    siswaCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener("change", function() {
-            let allChecked = document.querySelectorAll(".siswa-checkbox:checked").length === siswaCheckboxes.length;
-            document.getElementById("selectAll").checked = allChecked;
-        });
-    });
+            // Jika ada yang tidak dicentang, "Pilih Semua" akan nonaktif
+            let siswaCheckboxes = document.querySelectorAll(".siswa-checkbox");
+            siswaCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener("change", function() {
+                    let allChecked = document.querySelectorAll(".siswa-checkbox:checked").length === siswaCheckboxes.length;
+                    document.getElementById("selectAll").checked = allChecked;
+                });
+            });
 
-    document.addEventListener("DOMContentLoaded", function () {
-    const modal = document.getElementById("siswaModal");
-    const openModalBtn = document.getElementById("openModal");
-    const closeModalBtn = document.getElementById("closeModal");
-    const pilihSemua = document.getElementById("selectAll");
-    const checkboxes = document.querySelectorAll(".siswa-checkbox");
-    const btnOke = document.getElementById("confirmSelection");
-    const selectedSiswaDiv = document.getElementById("selectedSiswa");
+            document.addEventListener("DOMContentLoaded", function () {
+                const modal = document.getElementById("siswaModal");
+                const openModalBtn = document.getElementById("openModal");
+                const closeModalBtn = document.getElementById("closeModal");
+                const pilihSemua = document.getElementById("selectAll");
+                const checkboxes = document.querySelectorAll(".siswa-checkbox");
+                const btnOke = document.getElementById("confirmSelection");
+                const selectedSiswaDiv = document.getElementById("selectedSiswa");
 
-    // Buka Modal
-    openModalBtn.addEventListener("click", function () {
-        modal.style.display = "block";
-    });
+                // Buka Modal
+                openModalBtn.addEventListener("click", function () {
+                    modal.style.display = "block";
+                });
 
-    // Tutup Modal
-    closeModalBtn.addEventListener("click", function () {
-        modal.style.display = "none";
-    });
+                // Tutup Modal
+                closeModalBtn.addEventListener("click", function () {
+                    modal.style.display = "none";
+                });
 
-    // Pilih Semua Checkbox
-    pilihSemua.addEventListener("change", function () {
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = pilihSemua.checked;
-        });
-        updateButtonState();
-    });
+                // Pilih Semua Checkbox
+                pilihSemua.addEventListener("change", function () {
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = pilihSemua.checked;
+                    });
+                    updateButtonState();
+                });
 
-    // Jika ada yang tidak dicentang, "Pilih Semua" akan nonaktif
-    checkboxes.forEach(checkbox => {
-        checkbox.addEventListener("change", function () {
-            let allChecked = document.querySelectorAll(".siswa-checkbox:checked").length === checkboxes.length;
-            pilihSemua.checked = allChecked;
-            updateButtonState();
-        });
-    });
+                // Jika ada yang tidak dicentang, "Pilih Semua" akan nonaktif
+                checkboxes.forEach(checkbox => {
+                    checkbox.addEventListener("change", function () {
+                        let allChecked = document.querySelectorAll(".siswa-checkbox:checked").length === checkboxes.length;
+                        pilihSemua.checked = allChecked;
+                        updateButtonState();
+                    });
+                });
 
-    // Update Status Tombol "Oke"
-    function updateButtonState() {
-        let checkedCount = document.querySelectorAll(".siswa-checkbox:checked").length;
-        btnOke.disabled = checkedCount === 0;
-    }
+                // Update Status Tombol "Oke"
+                function updateButtonState() {
+                    let checkedCount = document.querySelectorAll(".siswa-checkbox:checked").length;
+                    btnOke.disabled = checkedCount === 0;
+                }
 
-    // Tombol Oke - Tampilkan Siswa yang Dipilih
-    btnOke.addEventListener("click", function () {
-        modal.style.display = "none";
-        let selectedSiswa = [];
-        document.querySelectorAll(".siswa-checkbox:checked").forEach(checkbox => {
-            selectedSiswa.push(checkbox.parentNode.textContent.trim());
-        });
+                // Tombol Oke - Tampilkan Siswa yang Dipilih
+                btnOke.addEventListener("click", function () {
+                    modal.style.display = "none";
+                    let selectedSiswa = [];
+                    document.querySelectorAll(".siswa-checkbox:checked").forEach(checkbox => {
+                        selectedSiswa.push(checkbox.parentNode.textContent.trim());
+                    });
 
-        // Tampilkan daftar siswa terpilih
-        selectedSiswaDiv.innerHTML = selectedSiswa.length > 0
-            ? "<strong>Siswa Terpilih:</strong> <br>" + selectedSiswa.join("<br>")
-            : "";
-    });
+                    // Tampilkan daftar siswa terpilih
+                    selectedSiswaDiv.innerHTML = selectedSiswa.length > 0
+                        ? "<strong>Siswa Terpilih:</strong> <br>" + selectedSiswa.join("<br>")
+                        : "";
+                });
 
-    // Klik di luar modal untuk menutup
-    window.addEventListener("click", function (event) {
-        if (event.target === modal) {
-            modal.style.display = "none";
-        }
-    });
-});
+                // Klik di luar modal untuk menutup
+                window.addEventListener("click", function (event) {
+                    if (event.target === modal) {
+                        modal.style.display = "none";
+                    }
+                });
+            });
+        </script>
 
-</script>
+        <style>
+            .notification {
+                padding: 10px;
+                margin-bottom: 15px;
+                border-radius: 5px;
+                text-align: center;
+                font-weight: bold;
+            }
 
-<style>
-    .notification {
-    padding: 10px;
-    margin-bottom: 15px;
-    border-radius: 5px;
-    text-align: center;
-    font-weight: bold;
-}
+            .success {
+                background-color: #d4edda;
+                color: #155724;
+                border: 1px solid #c3e6cb;
+            }
 
-.success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
+            .error {
+                background-color: #f8d7da;
+                color: #721c24;
+                border: 1px solid #f5c6cb;
+            }
 
-.error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
+                .alert {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background-color: #28a745; /* Hijau */
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                z-index: 1000;
+                font-size: 16px;
+            }
 
-    .alert {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background-color: #28a745; /* Hijau */
-    color: white;
-    padding: 12px 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    font-size: 16px;
-}
+            .alert.success {
+                background-color: #28a745; /* Hijau */
+            }
 
-.alert.success {
-    background-color: #28a745; /* Hijau */
-}
+                .selected-siswa {
+                margin-top: 15px;
+                padding: 10px;
+                background-color: #f8f9fa;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                font-size: 16px;
+                color: black;
+            }
 
-    .selected-siswa {
-    margin-top: 15px;
-    padding: 10px;
-    background-color: #f8f9fa;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 16px;
-    color: black;
-}
+            .btn-primary {
+                background-color: #007bff;
+                color: white;
+                border: none;
+                padding: 8px 12px;
+                cursor: pointer;
+                border-radius: 5px;
+                margin-top: 10px;
+            }
 
-    .btn-primary {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        padding: 8px 12px;
-        cursor: pointer;
-        border-radius: 5px;
-        margin-top: 10px;
-    }
+            .btn-primary:hover {
+                background-color: #0056b3;
+            }
 
-    .btn-primary:hover {
-        background-color: #0056b3;
-    }
+            .btn-secondary {
+                background-color: #6c757d;
+                color: white;
+                border: none;
+                padding: 8px 12px;
+                cursor: pointer;
+                border-radius: 5px;
+            }
 
-    .btn-secondary {
-        background-color: #6c757d;
-        color: white;
-        border: none;
-        padding: 8px 12px;
-        cursor: pointer;
-        border-radius: 5px;
-    }
-
-    .btn-secondary:hover {
-        background-color: #5a6268;
-    }
-</style>
-
+            .btn-secondary:hover {
+                background-color: #5a6268;
+            }
+        </style>
 
         <!-- Tenggat Tugas -->
         <div class="form-group">
@@ -414,12 +425,16 @@ if (isset($_SESSION['message'])) {
             <input type="date" name="tanggal_tenggat" id="tanggal_tenggat" required>
         </div>
 
+        <div class="form-group">
+            <label for="waktu_tenggat">Waktu Tenggat:</label>
+            <input type="time" name="waktu_tenggat" id="waktu_tenggat" required>
+        </div>
+
         <button type="submit" name="add_task" class="btn-primary">Tambah Tugas</button>
     </form>
 </div>
 
 <style>
-
     .container {
         width: 100%;
         background: #fff;
@@ -519,34 +534,34 @@ if (isset($_SESSION['message'])) {
         cursor: pointer;
     }
 
-.checkbox-container div {
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 16px;
-    font-weight: 500;
-    Color: black;
-}
+    .checkbox-container div {
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+        font-weight: 500;
+        Color: black;
+    }
 
-.checkbox-container input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    accent-color: #007bff; /* Warna checkbox */
-    cursor: pointer;
-}
+    .checkbox-container input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #007bff; /* Warna checkbox */
+        cursor: pointer;
+    }
 
-.modal-content {
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    padding: 20px;
-}
+    .modal-content {
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        padding: 20px;
+    }
 
-.modal-title {
-    color: #333;
-    font-size: 18px;
-    font-weight: bold;
-}
+    .modal-title {
+        color: #333;
+        font-size: 18px;
+        font-weight: bold;
+    }
 
 </style>
 

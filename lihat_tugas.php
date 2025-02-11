@@ -29,8 +29,7 @@ while ($row = $result_submit->fetch_assoc()) {
 $stmt_submit->close();
 
 // Mengambil daftar semua tugas yang sudah di-submit oleh siswa untuk form view
-$stmt_view = $conn->prepare("SELECT id_tugas, nama_tugas, deskripsi, status, file_name FROM tugas WHERE id_siswa = ? AND status = 'Submitted'");
-$stmt_view->bind_param("i", $id_siswa);
+$stmt_view = $conn->prepare("SELECT * FROM tugas WHERE status = 'Submitted'");
 $stmt_view->execute();
 $result_view = $stmt_view->get_result();
 
@@ -85,8 +84,6 @@ if (isset($_POST['retract_task'])) {
 $hari = date('l'); // Nama hari (Senin, Selasa, dll)
 $tanggal = date('F jS, Y'); // Format tanggal "October 21st, 2024"
 
-
-$conn->close();
 ?>
 
 
@@ -233,7 +230,7 @@ $conn->close();
                 </header>
 
     <h2>View Your Submitted Task</h2>
-    <form method="POST">
+    <!-- <form method="POST">
         <label for="id_tugas_view">Select Submitted Task:</label>
         <select name="id_tugas_view" id="id_tugas_view" onchange="showTaskDetailsView()" required>
             <option value="">--Select Task--</option>
@@ -243,7 +240,51 @@ $conn->close();
             }
             ?>
         </select>
-    </form>
+    </form> -->
+    <div style="width: 1200px;overflow-x: auto; min-height: 400px;">
+        <table style="width: 100%">
+            <thead>
+                <th>No</th>
+                <th>Tugas</th>
+                <th>Deskripsi</th>
+                <th>Tenggat</th>
+                <th>Siswa</th>
+                <th>Status Pengumpulan</th>
+                <th>File</th>
+            </thead>
+            <tbody>
+                <?php $i = 1; ?>
+                <?php foreach ($tugas_list_view as $tugas) { ?>
+                    <tr>
+                        <td><?= $i ?></td>
+                        <td><?= $tugas['nama_tugas'] ?></td>
+                        <td><?= $tugas['deskripsi'] ?></td>
+                        <td><?= $tugas['tanggal_tenggat'] . ', ' . $tugas['waktu'] ?></td>
+                        <td>
+                            <?php
+                                $stmt_getsiswa = $conn->prepare("SELECT siswa.id_siswa, siswa.nama_siswa 
+                                    FROM tugas 
+                                    JOIN siswa ON tugas.id_siswa = siswa.id_siswa 
+                                    WHERE tugas.id_tugas = ?");
+
+                                $stmt_getsiswa->bind_param("i", $tugas['id_tugas']);
+                                $stmt_getsiswa->execute();
+                                $result_getsiswa = $stmt_getsiswa->get_result();
+
+                                // Fetch and display results
+                                while ($row = $result_getsiswa->fetch_assoc()) {
+                                    echo $row['nama_siswa'];
+                                }
+                            ?>  
+                        </td>
+                        <td><?= $tugas['status'] ?></td>
+                        <td><?= $tugas['nama_tugas'] ?></td>
+                    </tr>
+                    <?php $i++; ?>
+                <?php } ?>
+            </tbody>
+        </table>
+    </div>
 
     <div id="task-details-view">
         <p>No task selected. Please select a task to view details.</p>
@@ -264,4 +305,8 @@ $conn->close();
     </form>
 
 </body>
+
+<?php
+$conn->close();
+?>
 </html>
