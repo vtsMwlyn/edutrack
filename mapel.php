@@ -1,111 +1,113 @@
 <?php
-session_start(); // Mulai session
+    session_start(); // Mulai session
 
-// Cek apakah pengguna sudah login
-if (!isset($_SESSION['username'])) {
-    header("Location: login.php"); // Redirect ke login jika belum login
-    exit();
-}
-
-// Ambil id_siswa dari session
-$id_siswa = $_SESSION['username'];
-
-// Include koneksi database
-include 'connect.php';
-
-// Mengambil daftar tugas yang belum di-submit untuk form submit
-$stmt_submit = $conn->prepare("SELECT id_tugas, nama_tugas, deskripsi, tanggal_tenggat FROM tugas WHERE (id_siswa IS NULL OR id_siswa != ?) AND status != 'Submitted'");
-$stmt_submit->bind_param("i", $id_siswa);
-$stmt_submit->execute();
-$result_submit = $stmt_submit->get_result();
-
-// Menyimpan daftar tugas yang belum di-submit dalam array
-$tugas_list_submit = [];
-while ($row = $result_submit->fetch_assoc()) {
-    $tugas_list_submit[] = $row;
-}
-$stmt_submit->close();
-
-// Mengambil daftar semua tugas yang sudah di-submit oleh siswa untuk form view
-$stmt_view = $conn->prepare("SELECT id_tugas, nama_tugas, deskripsi, status, file_name FROM tugas WHERE id_siswa = ? AND status = 'Submitted'");
-$stmt_view->bind_param("i", $id_siswa);
-$stmt_view->execute();
-$result_view = $stmt_view->get_result();
-
-// Menyimpan daftar tugas yang sudah di-submit dalam array
-$tugas_list_view = [];
-while ($row = $result_view->fetch_assoc()) {
-    $tugas_list_view[] = $row;
-}
-$stmt_view->close();
-
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file'])) {
-    $id_tugas = $_POST["id_tugas"];
-    
-    // Ambil data dari database berdasarkan ID tugas
-    $stmt = $conn->prepare("SELECT * FROM tugas WHERE id_tugas = ? AND (id_siswa IS NULL OR id_siswa = ?)");
-    $stmt->bind_param("is", $id_tugas, $id_siswa);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        // Validasi file yang diupload
-        $target_dir = "uploads/";
-
-        // Loop untuk memproses setiap file yang diupload
-        foreach ($_FILES['file']['name'] as $index => $file_name) {
-            if (!empty($file_name)) {
-                $tmp_name = $_FILES['file']['tmp_name'][$index];
-                $target_file = $target_dir . basename($file_name);
-
-                // Debugging file upload
-                echo "Processing file: $file_name<br>";
-                echo "Temporary location: $tmp_name<br>";
-
-                // Pastikan file berhasil dipindahkan
-                if (move_uploaded_file($tmp_name, $target_file)) {
-                    echo "File moved successfully to: $target_file<br>";
-
-                    // Update data tugas dengan detail siswa dan nama file
-                    $update_query = "UPDATE tugas SET id_siswa = ?, file_name = ?, status = 'Submitted' WHERE id_tugas = ?";
-                    $stmt_update = $conn->prepare($update_query);
-
-                    if ($stmt_update === false) {
-                        die("Prepare failed: " . $conn->error);
-                    }
-
-                    $stmt_update->bind_param("ssi", $id_siswa, $file_name, $id_tugas);
-
-                    if ($stmt_update->execute()) {
-                        echo "Database updated successfully. File name: $file_name<br>";
-                    } else {
-                        die("Error updating database: " . $stmt_update->error);
-                    }
-
-                    $stmt_update->close();
-                } else {
-                    echo "Failed to move file: $file_name<br>";
-                }
-            } else {
-                echo "No file uploaded.";
-            }
-        }
-    } else {
-        echo "No such assignment found or already submitted.";
+    // Cek apakah pengguna sudah login
+    if (!isset($_SESSION['username'])) {
+        header("Location: login.php"); // Redirect ke login jika belum login
+        exit();
     }
 
-
-    $stmt->close();
+    // Ambil username dari session
+    $username = $_SESSION['username'];
     
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Proses form submission di sini
+    // Include koneksi database
+    include 'connect.php';
 
-    // Setelah form disubmit, lakukan redirect untuk menyegarkan halaman
-    header("Location: " . $_SERVER['PHP_SELF']);
-    exit; // Pastikan tidak ada kode yang berjalan setelah header
-}
-}
-$conn->close();
+    /*
+     * Semua mekanisme di database make id semua, jadi harusnya jangan pake username (ini ambil lagi manual dari database karena kayaknya id pengguna ga kesimpen di database)
+     */
+    $stmt_getuser = $conn->prepare("SELECT id_siswa FROM siswa WHERE nama_siswa = ?");
+    $stmt_getuser->bind_param("s", $username);
+    $stmt_getuser->execute();
+    $result_getuser = $stmt_getuser->get_result();
+
+    $user = $result_getuser->fetch_assoc();
+    $id_siswa = $user['id_siswa'];
+
+    // Mengambil daftar tugas yang belum di-submit untuk form submit
+    $stmt_submit = $conn->prepare("SELECT id_tugas, nama_tugas, deskripsi, tanggal_tenggat FROM tugas WHERE id_siswa = ? AND status != 'Submitted'");
+    $stmt_submit->bind_param("i", $id_siswa);
+    $stmt_submit->execute();
+    $result_submit = $stmt_submit->get_result();
+
+    // Menyimpan daftar tugas yang belum di-submit dalam array
+    $tugas_list_submit = [];
+    while ($row = $result_submit->fetch_assoc()) {
+        $tugas_list_submit[] = $row;
+    }
+    $stmt_submit->close();
+
+    // Mengambil daftar semua tugas yang sudah di-submit oleh siswa untuk form view
+    $stmt_view = $conn->prepare("SELECT id_tugas, nama_tugas, deskripsi, status, file_name FROM tugas WHERE id_siswa = ? AND status = 'Submitted'");
+    $stmt_view->bind_param("i", $id_siswa);
+    $stmt_view->execute();
+    $result_view = $stmt_view->get_result();
+
+    // Menyimpan daftar tugas yang sudah di-submit dalam array
+    $tugas_list_view = [];
+    while ($row = $result_view->fetch_assoc()) {
+        $tugas_list_view[] = $row;
+    }
+    $stmt_view->close();
+
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file'])) {
+        $id_tugas = $_POST["id_tugas"];
+        
+        // Ambil data dari database berdasarkan ID tugas
+        $stmt = $conn->prepare("SELECT * FROM tugas WHERE id_tugas = ? AND id_siswa = ?");
+        $stmt->bind_param("ii", $id_tugas, $id_siswa);
+        $stmt->execute();
+        $result = $stmt->get_result();      
+
+        if ($result->num_rows > 0) {
+            // Validasi file yang diupload
+            $target_dir = "uploads/";
+
+            // Loop untuk memproses setiap file yang diupload
+            foreach ($_FILES['file']['name'] as $index => $file_name) {
+                if (!empty($file_name)) {
+                    $tmp_name = $_FILES['file']['tmp_name'][$index];
+                    $target_file = $target_dir . basename($file_name);
+
+                    // Debugging file upload
+                    echo "Processing file: $file_name<br>";
+                    echo "Temporary location: $tmp_name<br>";
+
+                    // Pastikan file berhasil dipindahkan
+                    if (move_uploaded_file($tmp_name, $target_file)) {
+                        echo "File moved successfully to: $target_file<br>";
+
+                        // Update data tugas dengan detail siswa dan nama file
+                        $stmt_update = $conn->prepare("UPDATE tugas SET id_siswa = ?, file_name = ?, status = 'Submitted' WHERE id_tugas = ?");
+                        $stmt_update->bind_param("isi", $id_siswa, $file_name, $id_tugas);
+
+                        if ($stmt_update === false) {
+                            die("Prepare failed: " . $conn->error);
+                        }
+
+                        if ($stmt_update->execute()) {
+                            echo "Database updated successfully. File name: $file_name<br>";
+                        } else {
+                            die("Error updating database: " . $stmt_update->error);
+                        }
+
+                        $stmt_update->close();
+                    } else {
+                        echo "Failed to move file: $file_name<br>";
+                    }
+                } else {
+                    echo "No file uploaded.";
+                }
+            }
+        } else {
+            echo "No such assignment found or already submitted.";
+        }
+
+
+        $stmt->close();
+    }
+
+    $conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -228,32 +230,6 @@ $conn->close();
                 <input type="file" name="file[]" id="file" accept="image/*,application/pdf" multiple required>
 
                 <input type="submit" class="btn btn-primary" value="Submit Task">
-
-                  <!-- PHP to handle file upload -->
-                  <?php
-                        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
-                            $targetDir = 'uploads/';
-                            $uploadSuccess = true;
-                            
-                            // Loop through each uploaded file
-                            foreach ($_FILES['file']['name'] as $key => $name) {
-                                $fileTmpName = $_FILES['file']['tmp_name'][$key];
-                                $targetFilePath = $targetDir . basename($name);
-
-                                // Move uploaded file to the uploads directory
-                                if (move_uploaded_file($fileTmpName, $targetFilePath)) {
-                                    echo "<p>File $name uploaded successfully.</p>";
-                                } else {
-                                    echo "<p>Error uploading file $name.</p>";
-                                    $uploadSuccess = false;
-                                }
-                            }
-
-                            if ($uploadSuccess) {
-                                echo "<p>All files have been uploaded successfully.</p>";
-                            }
-                        }
-                        ?>
             </form>
         </div>
 
