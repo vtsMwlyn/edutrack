@@ -29,14 +29,31 @@ while ($row = $result_submit->fetch_assoc()) {
 $stmt_submit->close();
 
 // Mengambil daftar semua tugas yang sudah di-submit oleh siswa untuk form view
-$stmt_view = $conn->prepare("SELECT * FROM tugas WHERE status = 'Submitted'");
+$stmt_all_submitted_task = $conn->prepare("SELECT * FROM tugas WHERE status = 'Submitted'");
+$stmt_all_submitted_task->execute();
+$result_all_submitted_task = $stmt_all_submitted_task->get_result();
+
+$all_submitted_task = [];
+while ($row = $result_all_submitted_task->fetch_assoc()) {
+    $all_submitted_task[] = $row;
+}
+$stmt_all_submitted_task->close();
+
+$query = "SELECT * FROM tugas WHERE status = 'Submitted'";
+if(isset($_GET['tugas'])){
+    $query = "SELECT * FROM tugas WHERE status = 'Submitted' AND id_tugas = ?";
+}
+$stmt_view = $conn->prepare($query);
+if(isset($_GET['tugas'])){
+    $stmt_view->bind_param('i', $_GET['tugas']);
+}
 $stmt_view->execute();
 $result_view = $stmt_view->get_result();
 
 // Menyimpan daftar tugas yang sudah di-submit dalam array
-$tugas_list_view = [];
+$filtered_tugas = [];
 while ($row = $result_view->fetch_assoc()) {
-    $tugas_list_view[] = $row;
+    $filtered_tugas[] = $row;
 }
 $stmt_view->close();
 
@@ -179,28 +196,28 @@ $tanggal = date('F jS, Y'); // Format tanggal "October 21st, 2024"
         const tugasDataView = <?php echo json_encode($tugas_list_view); ?>;
 
         // Fungsi untuk menampilkan deskripsi tugas berdasarkan pilihan dropdown untuk view form
-        function showTaskDetailsView() {
-            const selectElement = document.getElementById('id_tugas_view');
-            const taskDetailsElement = document.getElementById('task-details-view');
-            const selectedId = parseInt(selectElement.value);
+        // function showTaskDetailsView() {
+        //     const selectElement = document.getElementById('id_tugas_view');
+        //     const taskDetailsElement = document.getElementById('task-details-view');
+        //     const selectedId = parseInt(selectElement.value);
 
-            // Cari tugas yang sesuai dengan id_tugas yang dipilih
-            const selectedTask = tugasDataView.find(task => task.id_tugas === selectedId);
+        //     // Cari tugas yang sesuai dengan id_tugas yang dipilih
+        //     const selectedTask = tugasDataView.find(task => task.id_tugas === selectedId);
 
-            // Jika tugas ditemukan, tampilkan detailnya
-            if (selectedTask) {
-                taskDetailsElement.innerHTML = `
-                    <h3>Task Details</h3>
-                    <p><strong>Task ID:</strong> ${selectedTask.id_tugas}</p>
-                    <p><strong>Task Name:</strong> ${selectedTask.nama_tugas}</p>
-                    <p><strong>Description:</strong> ${selectedTask.deskripsi}</p>
-                    <p><strong>Status:</strong> ${selectedTask.status}</p>
-                    ${selectedTask.file_name ? "<p>Submitted File: <a href='uploads/" + selectedTask.file_name + "' download>Download</a></p>" : "<p>No file found for this task.</p>"}
-                `;
-            } else {
-                taskDetailsElement.innerHTML = "<p>No task selected. Please select a task to view details.</p>";
-            }
-        }
+        //     // Jika tugas ditemukan, tampilkan detailnya
+        //     if (selectedTask) {
+        //         taskDetailsElement.innerHTML = `
+        //             <h3>Task Details</h3>
+        //             <p><strong>Task ID:</strong> ${selectedTask.id_tugas}</p>
+        //             <p><strong>Task Name:</strong> ${selectedTask.nama_tugas}</p>
+        //             <p><strong>Description:</strong> ${selectedTask.deskripsi}</p>
+        //             <p><strong>Status:</strong> ${selectedTask.status}</p>
+        //             ${selectedTask.file_name ? "<p>Submitted File: <a href='uploads/" + selectedTask.file_name + "' download>Download</a></p>" : "<p>No file found for this task.</p>"}
+        //         `;
+        //     } else {
+        //         taskDetailsElement.innerHTML = "<p>No task selected. Please select a task to view details.</p>";
+        //     }
+        // }
     </script>
 </head>
 <body>
@@ -230,17 +247,18 @@ $tanggal = date('F jS, Y'); // Format tanggal "October 21st, 2024"
                 </header>
 
     <h2>View Your Submitted Task</h2>
-    <!-- <form method="POST">
-        <label for="id_tugas_view">Select Submitted Task:</label>
-        <select name="id_tugas_view" id="id_tugas_view" onchange="showTaskDetailsView()" required>
+    <form action="lihat_tugas.php" method="get" style="min-height: 150px">
+        <label for="tugas">Select Submitted Task:</label>
+        <select name="tugas" id="tugas" onchange="showTaskDetailsView()" required>
             <option value="">--Select Task--</option>
             <?php
-            foreach ($tugas_list_view as $tugas) {
+            foreach ($all_submitted_task as $tugas) {
                 echo "<option value='" . $tugas['id_tugas'] . "'>" . $tugas['nama_tugas'] . "</option>";
             }
             ?>
         </select>
-    </form> -->
+        <input type="submit" name="filter_tugas" value="Lihat Pengumpulan">
+    </form>
     <div style="width: 1200px;overflow-x: auto; min-height: 400px;">
         <table style="width: 100%">
             <thead>
@@ -254,7 +272,7 @@ $tanggal = date('F jS, Y'); // Format tanggal "October 21st, 2024"
             </thead>
             <tbody>
                 <?php $i = 1; ?>
-                <?php foreach ($tugas_list_view as $tugas) { ?>
+                <?php foreach ($filtered_tugas as $tugas) { ?>
                     <tr>
                         <td><?= $i ?></td>
                         <td><?= $tugas['nama_tugas'] ?></td>
