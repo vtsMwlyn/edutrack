@@ -40,13 +40,17 @@ while ($row = $result_all_submitted_task->fetch_assoc()) {
 $stmt_all_submitted_task->close();
 
 $query = "SELECT * FROM tugas WHERE status = 'Submitted'";
-if(isset($_GET['tugas'])){
-    $query = "SELECT * FROM tugas WHERE status = 'Submitted' AND id_tugas = ?";
+if (isset($_GET['tugas'])) {
+    $query = "SELECT * FROM tugas WHERE status = 'Submitted' AND nama_tugas LIKE ?";
 }
+
 $stmt_view = $conn->prepare($query);
-if(isset($_GET['tugas'])){
-    $stmt_view->bind_param('i', $_GET['tugas']);
+
+if (isset($_GET['tugas'])) {
+    $search = "%{$_GET['tugas']}%"; // Concatenating wildcards
+    $stmt_view->bind_param('s', $search);
 }
+
 $stmt_view->execute();
 $result_view = $stmt_view->get_result();
 
@@ -96,7 +100,28 @@ if (isset($_POST['retract_task'])) {
     }
     
     $stmt_retract->close();
+
+    
 }
+
+if (isset($_POST['mau_update_nilai'])) {
+    // print_r($id_siswa);
+    // die();
+
+    $stmt_update_nilai = $conn->prepare("UPDATE tugas SET nilai = ? WHERE id_tugas = ?");
+    $stmt_update_nilai->bind_param('ii', $_POST['nilai_baru'], $_POST['id_tugas']);
+    
+    if ($stmt_update_nilai->execute()) {
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
+    } else {
+        echo "Error: " . $stmt_update_nilai->error;
+    }
+
+    $stmt_update_nilai->close();
+}
+
+    
 // Tentukan waktu saat ini
 $hari = date('l'); // Nama hari (Senin, Selasa, dll)
 $tanggal = date('F jS, Y'); // Format tanggal "October 21st, 2024"
@@ -190,10 +215,11 @@ $tanggal = date('F jS, Y'); // Format tanggal "October 21st, 2024"
         }
 
     </style>
+    <!--
     <script>
         // Menyimpan data tugas dalam JavaScript agar dapat digunakan saat dropdown dipilih
-        const tugasDataSubmit = <?php echo json_encode($tugas_list_submit); ?>;
-        const tugasDataView = <?php echo json_encode($tugas_list_view); ?>;
+        // const tugasDataSubmit = <?php echo json_encode($tugas_list_submit); ?>;
+        // const tugasDataView = <?php echo json_encode($tugas_list_view); ?>;
 
         // Fungsi untuk menampilkan deskripsi tugas berdasarkan pilihan dropdown untuk view form
         // function showTaskDetailsView() {
@@ -219,6 +245,7 @@ $tanggal = date('F jS, Y'); // Format tanggal "October 21st, 2024"
         //     }
         // }
     </script>
+    -->
 </head>
 <body>
 <div class="dashboard-card">
@@ -253,7 +280,7 @@ $tanggal = date('F jS, Y'); // Format tanggal "October 21st, 2024"
             <option value="">--Select Task--</option>
             <?php
             foreach ($all_submitted_task as $tugas) {
-                echo "<option value='" . $tugas['id_tugas'] . "'>" . $tugas['nama_tugas'] . "</option>";
+                echo "<option value='" . $tugas['nama_tugas'] . "'>" . $tugas['nama_tugas'] . "</option>";
             }
             ?>
         </select>
@@ -269,6 +296,7 @@ $tanggal = date('F jS, Y'); // Format tanggal "October 21st, 2024"
                 <th>Siswa</th>
                 <th>Status Pengumpulan</th>
                 <th>File</th>
+                <th>Nilai</th>
             </thead>
             <tbody>
                 <?php $i = 1; ?>
@@ -297,6 +325,13 @@ $tanggal = date('F jS, Y'); // Format tanggal "October 21st, 2024"
                         </td>
                         <td><?= $tugas['status'] ?></td>
                         <td><?= $tugas['nama_tugas'] ?></td>
+                        <td>
+                            <form method="post" style="padding: 0; border-radius: 0; margin: 0; width: 50px;">
+                                <input type="number" class="nilai_baru" name="nilai_baru" value="<?= $tugas['nilai'] ?>">
+                                <input type="hidden" name="id_tugas" value="<?= $tugas['id_tugas'] ?>">
+                                <input type="hidden" name="mau_update_nilai">
+                            </form>
+                        </td>
                     </tr>
                     <?php $i++; ?>
                 <?php } ?>
@@ -321,6 +356,15 @@ $tanggal = date('F jS, Y'); // Format tanggal "October 21st, 2024"
         </select>
         <input type="submit" name="retract_task" value="Retract Task">
     </form>
+
+    <script>
+        const allInputNilai = document.querySelectorAll('.nilai_baru').forEach(inpNilai => {
+            inpNilai.addEventListener('change', function() {
+                let form = this.closest('form');
+                form.submit();
+            });
+        });
+    </script>
 
 </body>
 
