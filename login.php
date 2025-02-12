@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
             $_SESSION['tipe_pengguna'] = $user['tipe_pengguna']; // Simpan tipe pengguna
             switch ($user['tipe_pengguna']) {
                 case 'siswa':
-                    header('Location: mata_pelajaran_siswa.php');
+                    header('Location: mapel_pilihan.php');
                     break;
                 case 'guru':
                     header('Location: guru_dashboard.php');

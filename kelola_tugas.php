@@ -7,31 +7,44 @@ include 'connect.php'; // Pastikan koneksi database Anda di sini
 $error_message = "";
 $success_message = "";
 
+
 // Fungsi untuk menambah tugas
 if (isset($_POST['add_task'])) {
     $nama_tugas = $_POST['nama_tugas'];
     $deskripsi = $_POST['deskripsi'];
     $tanggal_tenggat = $_POST['tanggal_tenggat'];
-    $id_siswa = $_POST['id_siswa'];
-    
+    $waktu_tenggat = $_POST['waktu_tenggat']; // ✅ Include waktu_tenggat
+    $id_siswas = $_POST['id_siswa'];
+
     // Pastikan id_mapel ada dalam POST
     $id_mapel = isset($_POST['id_mapel']) ? $_POST['id_mapel'] : null;
 
     // Pastikan id_mapel tidak kosong
     if ($id_mapel !== null) {
-        // Tambahkan tugas
-        $mapel_ids = implode(",", $id_mapel); // Convert array to comma-separated values
-        $sql = "INSERT INTO tugas (nama_tugas, deskripsi, tanggal_tenggat, status, id_mapel, id_siswa) 
-                VALUES ('$nama_tugas', '$deskripsi', '$tanggal_tenggat', 'pending', '$mapel_ids', '$id_siswa')";
-        if (mysqli_query($conn, $sql)) {
-            $success_message = "Tugas berhasil ditambahkan untuk siswa!";
-        } else {
-            $error_message = "Error: " . mysqli_error($conn);
+        $all_queries_success = true; // Flag to check if all queries succeed
+
+        foreach ($id_siswas as $id_siswa) {
+            // Use prepared statements to prevent SQL injection
+            $stmt = $conn->prepare("INSERT INTO tugas (nama_tugas, deskripsi, tanggal_tenggat, waktu, status, id_mapel, id_siswa) 
+                                    VALUES (?, ?, ?, ?, 'pending', ?, ?)");
+            $stmt->bind_param("ssssii", $nama_tugas, $deskripsi, $tanggal_tenggat, $waktu_tenggat, $id_mapel, $id_siswa);
+
+            if (!$stmt->execute()) {
+                $all_queries_success = false;
+                $error_message = "Error: " . $stmt->error;
+                break; // Stop execution if one query fails
+            }
         }
+
+        if ($all_queries_success) {
+            $success_message = "Tugas berhasil ditambahkan untuk semua siswa!";
+        }
+
     } else {
         $error_message = "Mata pelajaran harus dipilih!";
     }
 }
+
 
 // Pastikan user sudah login, jika belum arahkan ke halaman login
 if (!isset($_SESSION['username'])) {
@@ -48,7 +61,6 @@ if (!$conn) {
 
 // Ambil nama pengguna dari session
 $username = $_SESSION['username'];
-$user_type = $_SESSION['tipe_pengguna'];
 
 // Ambil id_guru dari tabel guru berdasarkan pengguna yang login
 $query_guru = "SELECT id_guru FROM guru WHERE id_pengguna = ?";
@@ -85,99 +97,43 @@ $tanggal = date('F jS, Y'); // Format tanggal "October 21st, 2024"
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>EduTrack Teacher Dashboard</title>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css" rel="stylesheet" />
+     <!-- FullCalendar -->
+     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css" rel="stylesheet">
+    <!-- Custom Styles -->
     <link rel="stylesheet" href="style.css">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <style>
-        .container {
-            max-height: 90vh; /* Membatasi tinggi kontainer */
-            overflow-y: auto; /* Aktifkan scroll jika konten terlalu panjang */
-            width: 100%;
-        }
-
-        form {
-            background-color: #ffffff;
-            border-radius: 15px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin-bottom: 40px;
-            /* margin-left: -500px; */
-            display: flex; /* Aktifkan flexbox untuk membuatnya fleksibel */
-            flex-direction: column; /* Konten di dalam form tetap vertikal */
-            width: 100%; /* Gunakan persentase agar melebar sesuai ukuran layar */
-            max-height: 80vh; /* Membatasi tinggi form */
-            overflow-y: auto; /* Aktifkan scroll vertikal */
-            font-family: 'Arial', sans-serif;
-        }
-
-
-        form h2 {
-            font-size: 20px;
-            color: #333;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        form label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            font-size: 14px;
-            color: #555;
-        }
-
-        form input[type="text"],
-        form input[type="date"],
-        form select,
-        form textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            color: #333;
-            background-color: #f9f9f9;
-            box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease-in-out;
-        }
-
-        form button {
-            background-color: #62c1b6;
-            color: #fff;
-            border: none;
-            padding: 12px 16px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            width: 100%;
-            text-align: center;
-        }
-
-        form button:hover {
-            background-color: #504e76;
-            transform: scale(1.02);
-        }
-
-    </style>
+    <link rel="stylesheet" href="style.css">
+    
 </head>
 <body>
-    <div class="dashboard-card">
-        <div class="dashboard-container">
+   <!-- Header -->
+   <header>
+  <nav class="navbar">
+    <div class="logo" >
+        
+      <img src="https://cdn.discordapp.com/attachments/1282538476079677533/1335218996852555808/Untitled_design_20250201_190204_0000.png?ex=67a0b098&is=679f5f18&hm=df23008f6322f361d3fac53002f2442809d42acfc0fc096b3641e26bb78f978e&" alt="EduTrack Logo" class="logo-img">
+      <span style="color:white;">EduTrack</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="aboutus.php">About Us</a></li>
+      <li><a href="rateus.php">Rate Us</a></li>
+    </ul>
+  </nav>
+</header>
             <!-- Sidebar -->
-            <aside class="sidebar">
+            <aside class="sidebar" style="margin-top:-876px">
                 <nav class="menu">
                     <ul>
-                        <li><a href="guru_dashboard.php"><i class="fas fa-home"></i></a></li>
-                        <li><a href="kelola_tugas.php"><i class="fas fa-chalkboard-teacher"></i></a></li>
-                        <li><a href="mapel_guru.php"><i class="fas fa-user"></i></a></li>
+                    <li><a href="guru_dashboard.php" ><i class="fas fa-home"></i></a></li>
+                    <li><a href="kelola_tugas.php" class="active"><i class="fas fa-chalkboard-teacher"></i></a></li>
+                    <li><a href="calender_guru.php"><i class="fas fa-calendar-alt"></i></a></li>
+                    <li><a href="lihat_tugas.php"><i class="fas fa-calendar-alt"></i></a></li>
+
                     </ul>
                 </nav>
             </aside>
@@ -192,146 +148,442 @@ $tanggal = date('F jS, Y'); // Format tanggal "October 21st, 2024"
                     </div>
                 </header>
 
-                <!-- Pesan Sukses atau Error -->
-                <?php if ($success_message): ?>
-                    <p style="color: green;"><?php echo $success_message; ?></p>
-                <?php endif; ?>
-                <?php if ($error_message): ?>
-                    <p style="color: red;"><?php echo $error_message; ?></p>
-                <?php endif; ?>
+                <?php
+include 'connect.php'; // Pastikan koneksi database sudah disertakan
 
-            <div class="container">
-                    <!-- Form Pilih Siswa -->
-                    <form method="POST">
-                        <h2>Pilih Siswa</h2>
-                        <label for="id_siswa_selected">Pilih Siswa:</label>
-                        <select name="id_siswa_selected" id="id_siswa_selected" required>
-                            <option value="">-- Pilih Siswa --</option>
-                            <!-- PHP loop untuk daftar siswa -->
-                            <?php
-                            $result = mysqli_query($conn, "SELECT id_siswa, nama_siswa FROM siswa");
-                            while ($row = mysqli_fetch_assoc($result)) {
-                                $selected = ($row['id_siswa'] == $id_siswa_selected) ? "selected" : "";
-                                echo "<option value='" . $row['id_siswa'] . "' $selected>" . $row['nama_siswa'] . "</option>";
-                            }
-                            ?>
-                        </select>
-                        <button type="submit">Lihat Mata Pelajaran</button>
-                    </form>
+// Proses penyimpanan tugas jika form dikirim
+if (isset($_POST['add_task'])) {
+    $id_mapel = $_POST['id_mapel'];
+    $nama_tugas = $_POST['nama_tugas'];
+    $deskripsi = $_POST['deskripsi'];
+    $tanggal_tenggat = $_POST['tanggal_tenggat'];
 
-                    <?php if ($id_siswa_selected): ?>
-                        <!-- Form Tambah Tugas -->
-                        <form method="POST" class="form.2">
-                            <h2>Tambah Tugas untuk Siswa</h2>
-                            <input type="hidden" name="id_siswa" value="<?php echo $id_siswa_selected; ?>">
-                            <label for="nama_tugas">Nama Tugas:</label>
-                            <input type="text" name="nama_tugas" id="nama_tugas" placeholder="Masukkan nama tugas" required>
+    // Pastikan siswa dipilih sebelum memproses
+    if (isset($_POST['id_siswa']) && is_array($_POST['id_siswa']) && count($_POST['id_siswa']) > 0) {
+        $id_siswa_list = $_POST['id_siswa'];
 
-                            <label for="deskripsi">Deskripsi:</label>
-                            <textarea name="deskripsi" id="deskripsi" placeholder="Masukkan deskripsi tugas" required></textarea>
+        foreach ($id_siswa_list as $id_siswa) {
+            $insert_query = "INSERT INTO assignments (id_mapel, id_siswa, nama_tugas, deskripsi, tanggal_tenggat) 
+                             VALUES ('$id_mapel', '$id_siswa', '$nama_tugas', '$deskripsi', '$tanggal_tenggat')";
+            mysqli_query($conn, $insert_query);
+        }
 
-                            <label for="tanggal_tenggat">Tanggal Tenggat:</label>
-                            <input type="date" name="tanggal_tenggat" id="tanggal_tenggat" required>
-
-                            <label for="id_mapel">Mata Pelajaran Wajib & Pilihan:</label>
-                            <select name="id_mapel[]" id="id_mapel" multiple required>
-                                <?php
-                                $mapel_query = mysqli_query($conn, "SELECT id_mapel, nama_mapel FROM mata_pelajaran");
-                                while ($mapel = mysqli_fetch_assoc($mapel_query)) {
-                                    echo "<option value='" . $mapel['id_mapel'] . "'>" . $mapel['nama_mapel'] . "</option>";
-                                }
-                                ?>
-                            </select>
-
-                            <button type="submit" name="add_task">Tambah Tugas</button>
-                        </form>
-
-                        <!-- Tabel Daftar Tugas -->
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Nama Tugas</th>
-                                    <th>Deskripsi</th>
-                                    <th>Tanggal Tenggat</th>
-                                    <th>Status</th>
-                                    <th>Mata Pelajaran</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php
-                                $tugas_query = mysqli_query($conn, "SELECT t.*, mp.nama_mapel 
-                                                                    FROM tugas t 
-                                                                    JOIN mata_pelajaran mp ON FIND_IN_SET(t.id_mapel, mp.id_mapel) 
-                                                                    WHERE t.id_siswa = '$id_siswa_selected'");
-                                if ($tugas_query && mysqli_num_rows($tugas_query) > 0) {
-                                    while ($tugas = mysqli_fetch_assoc($tugas_query)) {
-                                        echo "<tr>
-                                                <td>" . $tugas['nama_tugas'] . "</td>
-                                                <td>" . $tugas['deskripsi'] . "</td>
-                                                <td>" . $tugas['tanggal_tenggat'] . "</td>
-                                                <td>" . $tugas['status'] . "</td>
-                                                <td>" . $tugas['nama_mapel'] . "</td>
-                                            </tr>";
-                                    }
-                                } else {
-                                    echo "<tr><td colspan='5'>Tidak ada tugas untuk siswa ini.</td></tr>";
-                                }
-                                ?>
-                            </tbody>
-                        </table>
-                    <?php endif; ?>
-                </div>
-            </main>
-            <!-- Profile Sidebar -->
-  <div id="sidebar" class="profile-sidebar">
-    <div class="profile-overview">
-        <img src="https://cdn.discordapp.com/attachments/749553877333835846/1305882693116100608/3778bb3bb63024da3c52aa0f47fdd603.png?ex=6734a588&is=67335408&hm=5b951564b1a1246b3decb6dfdceafbde2e16ef24ae1484c09e81bb268096d39b&" alt="Profile Picture" class="profile-pic">
-        <h2><?php echo htmlspecialchars($username);  ?>!</h2></h2>
-    </div>
-    <div class="profile-stats">
-    <div><?php echo htmlspecialchars($user_type); ?></div>
-        <div>Unit: Highschool</div>
-    </div>
-    <button class="logout-button" onclick="window.location.href='logout.php'">
-    <i class="fas fa-sign-out-alt"></i> 
-</button>
-
-</button>
-
-           
-    <!-- Toggle Button -->
-<div class="right-container">
-			<button id="toggle-btn" class="sidebar-toggle">
-			<i class="fas fa-user-circle"></i>
-			</button>
-			</div>
-                <nav class="menus">
-                    <ul>
-                   
-</button>
-
-                    </ul>
-                </nav>
-            </aside>
-            
-		   
-</div>
-        </div>
-    </div>
-    <script>
-    // Toggle Sidebar on Button Click
-document.getElementById("toggle-btn").addEventListener("click", function() {
-    var sidebar = document.getElementById("sidebar");
-    sidebar.classList.toggle("open");
-});
-
-// Fungsi untuk mengarahkan ke halaman kelas saat kartu diklik
-function openClass(subject) {
-        alert('Masuk ke kelas: ' + subject);
-        // Anda bisa mengubah alert menjadi redirect ke halaman kelas, misalnya:
-        // window.location.href = '/kelas/' + subject.toLowerCase();
+        $_SESSION['message'] = "<p class='success'>Tugas berhasil ditambahkan!</p>";
+    } else {
+        $_SESSION['message'] = "<p class='error'>Harap pilih setidaknya satu siswa.</p>";
     }
 
+    header("Location: " . $_SERVER['PHP_SELF']); // Refresh halaman setelah submit
+    exit();
+}
+?>
+
+<div class="container">
+    <?php
+        if (isset($_SESSION['message'])) {
+            echo "<div class='notification'>" . $_SESSION['message'] . "</div>";
+            unset($_SESSION['message']); // Hapus pesan setelah ditampilkan
+        }
+    ?>
+
+    <form method="POST" class="form-tugas">
+        <h2>Tambah Tugas</h2>
+
+        <!-- Pilih Mata Pelajaran -->
+        <div class="form-group">
+            <label for="id_mapel">Pilih Mata Pelajaran:</label>
+            <select name="id_mapel" id="id_mapel" required>
+                <option value="">-- Pilih Mata Pelajaran --</option>
+                <?php
+                $mapel_query = mysqli_query($conn, "SELECT id_mapel, nama_mapel FROM mata_pelajaran");
+                while ($mapel = mysqli_fetch_assoc($mapel_query)) {
+                    echo "<option value='" . $mapel['id_mapel'] . "'>" . $mapel['nama_mapel'] . "</option>";
+                }
+                ?>
+            </select>
+        </div>
+
+        <!-- Detail Tugas -->
+        <div class="form-group">
+            <label for="nama_tugas">Nama Tugas:</label>
+            <input type="text" name="nama_tugas" id="nama_tugas" required>
+        </div>
+
+        <div class="form-group">
+            <label for="deskripsi">Deskripsi:</label>
+            <textarea name="deskripsi" id="deskripsi" required></textarea>
+        </div>
+
+        <!-- Pilih Siswa -->
+        <div class="form-group">
+            <label>Pilih Siswa:</label>
+            <button type="button" id="openModal" class="btn-secondary">Pilih Siswa</button>
+            <div id="siswaModal" class="modal">
+                <div class="modal-content">
+                    <span id="closeModal" class="close">&times;</span>
+                    <h3 class="modal-title">Daftar Siswa</h3>
+
+                    <!-- Checkbox Pilih Semua -->
+                    <div class="checkbox-container">
+                        <div>
+                            <input type="checkbox" id="selectAll"> <strong>Pilih Semua</strong>
+                        </div>
+                    </div>
+
+                    <!-- Daftar Siswa -->
+                    <div class="checkbox-container">
+                        <?php
+                            $siswa_query = mysqli_query($conn, "SELECT id_siswa, nama_siswa FROM siswa");
+
+                            while ($siswa = mysqli_fetch_assoc($siswa_query)) {
+                                echo "<div><input type='checkbox' class='siswa-checkbox' name='id_siswa[]' value='" . $siswa['id_siswa'] . "'> " . $siswa['nama_siswa'] . "</div>";
+                            }
+                        ?>
+                    </div>
+
+                    <!-- Tombol Oke -->
+                    <button type="button" id="confirmSelection" class="btn-primary" disabled>Oke</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menampilkan daftar siswa yang dipilih -->
+        <div id="selectedSiswa" class="selected-siswa"></div>
+
+        <script>
+            document.getElementById("openModal").addEventListener("click", function() {
+                document.getElementById("siswaModal").style.display = "block";
+            });
+
+            document.getElementById("closeModal").addEventListener("click", function() {
+                document.getElementById("siswaModal").style.display = "none";
+            });
+
+            document.getElementById("confirmSelection").addEventListener("click", function() {
+                document.getElementById("siswaModal").style.display = "none";
+            });
+
+            // Pilih Semua Checkbox
+            document.getElementById("selectAll").addEventListener("change", function() {
+                let checkboxes = document.querySelectorAll(".siswa-checkbox");
+                checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+            });
+
+            // Jika ada yang tidak dicentang, "Pilih Semua" akan nonaktif
+            let siswaCheckboxes = document.querySelectorAll(".siswa-checkbox");
+            siswaCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener("change", function() {
+                    let allChecked = document.querySelectorAll(".siswa-checkbox:checked").length === siswaCheckboxes.length;
+                    document.getElementById("selectAll").checked = allChecked;
+                });
+            });
+
+            document.addEventListener("DOMContentLoaded", function () {
+                const modal = document.getElementById("siswaModal");
+                const openModalBtn = document.getElementById("openModal");
+                const closeModalBtn = document.getElementById("closeModal");
+                const pilihSemua = document.getElementById("selectAll");
+                const checkboxes = document.querySelectorAll(".siswa-checkbox");
+                const btnOke = document.getElementById("confirmSelection");
+                const selectedSiswaDiv = document.getElementById("selectedSiswa");
+
+                // Buka Modal
+                openModalBtn.addEventListener("click", function () {
+                    modal.style.display = "block";
+                });
+
+                // Tutup Modal
+                closeModalBtn.addEventListener("click", function () {
+                    modal.style.display = "none";
+                });
+
+                // Pilih Semua Checkbox
+                pilihSemua.addEventListener("change", function () {
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = pilihSemua.checked;
+                    });
+                    updateButtonState();
+                });
+
+                // Jika ada yang tidak dicentang, "Pilih Semua" akan nonaktif
+                checkboxes.forEach(checkbox => {
+                    checkbox.addEventListener("change", function () {
+                        let allChecked = document.querySelectorAll(".siswa-checkbox:checked").length === checkboxes.length;
+                        pilihSemua.checked = allChecked;
+                        updateButtonState();
+                    });
+                });
+
+                // Update Status Tombol "Oke"
+                function updateButtonState() {
+                    let checkedCount = document.querySelectorAll(".siswa-checkbox:checked").length;
+                    btnOke.disabled = checkedCount === 0;
+                }
+
+                // Tombol Oke - Tampilkan Siswa yang Dipilih
+                btnOke.addEventListener("click", function () {
+                    modal.style.display = "none";
+                    let selectedSiswa = [];
+                    document.querySelectorAll(".siswa-checkbox:checked").forEach(checkbox => {
+                        selectedSiswa.push(checkbox.parentNode.textContent.trim());
+                    });
+
+                    // Tampilkan daftar siswa terpilih
+                    selectedSiswaDiv.innerHTML = selectedSiswa.length > 0
+                        ? "<strong>Siswa Terpilih:</strong> <br>" + selectedSiswa.join("<br>")
+                        : "";
+                });
+
+                // Klik di luar modal untuk menutup
+                window.addEventListener("click", function (event) {
+                    if (event.target === modal) {
+                        modal.style.display = "none";
+                    }
+                });
+            });
+        </script>
+
+        <style>
+            .notification {
+                padding: 10px;
+                margin-bottom: 15px;
+                border-radius: 5px;
+                text-align: center;
+                font-weight: bold;
+            }
+
+            .success {
+                background-color: #d4edda;
+                color: #155724;
+                border: 1px solid #c3e6cb;
+            }
+
+            .error {
+                background-color: #f8d7da;
+                color: #721c24;
+                border: 1px solid #f5c6cb;
+            }
+
+                .alert {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background-color: #28a745; /* Hijau */
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                z-index: 1000;
+                font-size: 16px;
+            }
+
+            .alert.success {
+                background-color: #28a745; /* Hijau */
+            }
+
+                .selected-siswa {
+                margin-top: 15px;
+                padding: 10px;
+                background-color: #f8f9fa;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                font-size: 16px;
+                color: black;
+            }
+
+            .btn-primary {
+                background-color: #007bff;
+                color: white;
+                border: none;
+                padding: 8px 12px;
+                cursor: pointer;
+                border-radius: 5px;
+                margin-top: 10px;
+            }
+
+            .btn-primary:hover {
+                background-color: #0056b3;
+            }
+
+            .btn-secondary {
+                background-color: #6c757d;
+                color: white;
+                border: none;
+                padding: 8px 12px;
+                cursor: pointer;
+                border-radius: 5px;
+            }
+
+            .btn-secondary:hover {
+                background-color: #5a6268;
+            }
+        </style>
+
+        <!-- Tenggat Tugas -->
+        <div class="form-group">
+            <label for="tanggal_tenggat">Tanggal Tenggat:</label>
+            <input type="date" name="tanggal_tenggat" id="tanggal_tenggat" required>
+        </div>
+
+        <div class="form-group">
+            <label for="waktu_tenggat">Waktu Tenggat:</label>
+            <input type="time" name="waktu_tenggat" id="waktu_tenggat" required>
+        </div>
+
+        <button type="submit" name="add_task" class="btn-primary">Tambah Tugas</button>
+    </form>
+</div>
+
+<style>
+    .container {
+        width: 100%;
+        background: #fff;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        max-width:10000px;
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+    }
+
+    .form-tugas {
+        width: 100%;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        text-align: left;
+        color: black;
+
+    }
+
+    input, select, textarea, button {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 16px;
+        margin-top: 5px;
+    }
+
+    button {
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+        cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+        background-color: #fff;
+        margin: 10% auto;
+        padding: 20px;
+        border-radius: 10px;
+        width: 50%;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .checkbox-container div {
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+        font-weight: 500;
+        Color: black;
+    }
+
+    .checkbox-container input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #007bff; /* Warna checkbox */
+        cursor: pointer;
+    }
+
+    .modal-content {
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        padding: 20px;
+    }
+
+    .modal-title {
+        color: #333;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+</style>
+
+<script>
+    const modal = document.getElementById('siswaModal');
+    const btn = document.getElementById('openModal');
+    const span = document.getElementById('closeModal');
+
+    btn.onclick = function () {
+        modal.style.display = "block";
+    };
+
+    span.onclick = function () {
+        modal.style.display = "none";
+    };
+
+    window.onclick = function (event) {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    };
 </script>
+
 </body>
 </html>

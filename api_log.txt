@@ -260,13 +260,7 @@ Send OTP Response: {"status":true,"message":"Request generated successfully","co
 
 Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
 
-Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"e485da63-f8d6-454f-a5f1-70ce4a56411d","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
-
-Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
-
-Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"ab302deb-631b-476c-abad-5d9200907d23","otp":"XXXXXX","otp_length":6,"prefix":"0895","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
-
-Verify OTP Response: {"status":false,"message":"OTP invalid","code":"4030201"}
+Send OTP Response: {"status":true,"message":"Request generated successfully","code":"2000200","data":{"id":"eb119bad-ee4d-4443-a466-a84cfc35a43a","otp":"XXXXXX","otp_length":6,"prefix":"0811","channel":"WA Generic OTP","provider":"FAZPASS","purpose":"Development"}}
 
 Verify OTP Response: {"status":true,"message":"Validate otp successfully","code":"2000200"}
 
